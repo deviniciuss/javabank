@@ -13,6 +13,7 @@ public class Bank {
     private AccountManager accountManager;
     private Set<Customer> customers = new HashSet<>();
 
+
     /**
      * Creates a new instance of Bank and initializes it with the given account manager
      *
@@ -31,6 +32,7 @@ public class Bank {
     public void addCustomer(Customer customer) {
         customers.add(customer);
         customer.setAccountManager(accountManager);
+        customer.setIdCustomer(customers.size()) ;
     }
 
     /**
@@ -48,4 +50,14 @@ public class Bank {
 
         return balance;
     }
+    public boolean checkId(int id) {
+        for (Customer x : customers) {
+            if (id == x.getIdCustomer()) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
 }
