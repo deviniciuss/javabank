@@ -92,4 +92,8 @@ public class Bank {
     public void addCustomer(Customer customer) {
         customers.put(customer.getId(), customer);
     }
+
+    public HashMap<Integer, Customer> getCustomers() {
+        return customers;
+    }
 }
