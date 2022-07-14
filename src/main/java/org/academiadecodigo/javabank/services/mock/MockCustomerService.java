@@ -1,33 +1,39 @@
 package org.academiadecodigo.javabank.services.mock;
 
 import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.model.Model;
 import org.academiadecodigo.javabank.model.account.Account;
+import org.academiadecodigo.javabank.persistence.SessionManager;
+import org.academiadecodigo.javabank.persistence.TransactionManager;
 import org.academiadecodigo.javabank.services.CustomerService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * An {@link CustomerService} implementation
+ * A mock {@link CustomerService} implementation
  */
 public class MockCustomerService implements CustomerService {
 
     private Map<Integer, Customer> customerMap = new HashMap<>();
 
     /**
-     * Gets the next account id
+     * Gets the next customer id
      *
-     * @return the next id
+     * @return the customer id
      */
     private Integer getNextId() {
         return customerMap.isEmpty() ? 1 : Collections.max(customerMap.keySet()) + 1;
     }
 
-    /**
-     * @see CustomerService#get(Integer)
-     */
     @Override
-    public Customer get(Integer id) {
-        return customerMap.get(id);
+    public void setTm(TransactionManager tm) {
+
+    }
+
+    @Override
+    public void setSm(SessionManager sm) {
+
     }
 
     /**
@@ -39,47 +45,60 @@ public class MockCustomerService implements CustomerService {
     }
 
     /**
-     * @see CustomerService#listCustomerAccountIds(Integer)
+     * @see CustomerService#get(Integer)
      */
     @Override
-    public Set<Integer> listCustomerAccountIds(Integer id) {
-
-        Set<Integer> accountIds = new HashSet<>();
-        List<Account> accountList = customerMap.get(id).getAccounts();
-
-        for (Account account : accountList) {
-            accountIds.add(account.getId());
-        }
-
-        return accountIds;
+    public Customer get(Integer id) {
+        return customerMap.get(id);
     }
 
     /**
-     * @see CustomerService#getBalance(int)
+     * @see CustomerService#save(Customer)
      */
     @Override
-    public double getBalance(int id) {
-
-        List<Account> accounts = customerMap.get(id).getAccounts();
-
-        double balance = 0;
-        for (Account account : accounts) {
-            balance += account.getBalance();
-        }
-
-        return balance;
-    }
-
-    /**
-     * @see CustomerService#add(Customer)
-     */
-    @Override
-    public void add(Customer customer) {
+    public Customer save(Customer customer) {
 
         if (customer.getId() == null) {
             customer.setId(getNextId());
         }
 
         customerMap.put(customer.getId(), customer);
+
+        return customer;
+
+    }
+
+    /**
+     * @see CustomerService#delete(Integer)
+     */
+    @Override
+    public void delete(Integer id) {
+        customerMap.remove(id);
+    }
+
+    /**
+     * @see CustomerService#getBalance(Integer)
+     */
+    @Override
+    public double getBalance(Integer id) {
+
+        List<Account> accounts = customerMap.get(id).getAccounts();
+
+        return accounts.stream()
+                .mapToDouble(Account::getBalance)
+                .sum();
+    }
+
+    /**
+     * @see CustomerService#listCustomerAccountIds(Integer)
+     */
+    @Override
+    public Set<Integer> listCustomerAccountIds(Integer id) {
+
+        List<Account> accounts = customerMap.get(id).getAccounts();
+
+        return accounts.stream()
+                .map(Model::getId)
+                .collect(Collectors.toSet());
     }
 }

@@ -5,10 +5,11 @@ import org.academiadecodigo.javabank.controller.*;
 import org.academiadecodigo.javabank.controller.transaction.DepositController;
 import org.academiadecodigo.javabank.controller.transaction.WithdrawalController;
 import org.academiadecodigo.javabank.factories.AccountFactory;
-import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.persistence.SessionManager;
+import org.academiadecodigo.javabank.persistence.TransactionManager;
 import org.academiadecodigo.javabank.services.AccountService;
-import org.academiadecodigo.javabank.services.CustomerService;
 import org.academiadecodigo.javabank.services.AuthServiceImpl;
+import org.academiadecodigo.javabank.services.CustomerService;
 import org.academiadecodigo.javabank.view.*;
 
 import java.util.HashMap;
@@ -22,7 +23,17 @@ public class Bootstrap {
     private AuthServiceImpl authService;
     private CustomerService customerService;
     private AccountService accountService;
-    private AccountFactory accountFactory;
+    private TransactionManager tm;
+
+    private SessionManager sm;
+
+    public void setTm(TransactionManager tm) {
+        this.tm = tm;
+    }
+
+    public void setSm(SessionManager sm) {
+        this.sm = sm;
+    }
 
     /**
      * Sets the authentication service
@@ -52,15 +63,6 @@ public class Bootstrap {
     }
 
     /**
-     * Sets the account factory
-     *
-     * @param accountFactory
-     */
-    public void setAccountFactory(AccountFactory accountFactory) {
-        this.accountFactory = accountFactory;
-    }
-
-    /**
      * Wires the necessary object dependencies
      *
      * @return the login controller
@@ -71,6 +73,10 @@ public class Bootstrap {
         Prompt prompt = new Prompt(System.in, System.out);
 
         // wire services
+        tm.setSm(sm);
+
+        customerService.setTm(tm);
+        accountService.setTm(tm);
         authService.setCustomerService(customerService);
 
         // wire login controller and view
@@ -101,9 +107,9 @@ public class Bootstrap {
         // wire new account controller and view
         NewAccountView newAccountView = new NewAccountView();
         NewAccountController newAccountController = new NewAccountController();
-        newAccountController.setAccountFactory(accountFactory);
         newAccountController.setAccountService(accountService);
         newAccountController.setAuthService(authService);
+        newAccountController.setAccountFactory(new AccountFactory());
         newAccountController.setView(newAccountView);
         newAccountView.setNewAccountController(newAccountController);
 
@@ -136,4 +142,6 @@ public class Bootstrap {
 
         return loginController;
     }
+
+
 }

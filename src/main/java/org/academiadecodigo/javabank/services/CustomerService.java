@@ -1,6 +1,8 @@
 package org.academiadecodigo.javabank.services;
 
 import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.persistence.SessionManager;
+import org.academiadecodigo.javabank.persistence.TransactionManager;
 
 import java.util.List;
 import java.util.Set;
@@ -10,20 +12,48 @@ import java.util.Set;
  */
 public interface CustomerService {
 
-    /**
-     * Gets the customer
-     *
-     * @param id the customer id
-     * @return the customer with the given id
-     */
-    Customer get(Integer id);
+
+   void setTm(TransactionManager tm);
+
+    void setSm(SessionManager sm);
 
     /**
-     * Gets the list of customers
+     * Gets a list of the customers
      *
      * @return the customer list
      */
     List<Customer> list();
+
+    /**
+     * Gets the customer
+     *
+     * @param id the customer id
+     * @return the customer
+     */
+    Customer get(Integer id);
+
+    /**
+     * Saves the customer
+     *
+     * @param customer to be saved
+     * @return the saved customer
+     */
+    Customer save(Customer customer);
+
+    /**
+     * Deletes a customer
+     *
+     * @param id the id of the customer to be deleted
+     */
+    void delete(Integer id);
+
+    /**
+     * Gets the balance of the customer
+     *
+     * @param id the customer id
+     * @return the balance of the customer with the given id
+     */
+    double getBalance(Integer id);
 
     /**
      * Gets the set of customer account ids
@@ -33,18 +63,8 @@ public interface CustomerService {
      */
     Set<Integer> listCustomerAccountIds(Integer id);
 
-    /**
-     * Gets the balance of the customer
-     *
-     * @param id the customer id
-     * @return the balance of the customer with the given id
-     */
-    double getBalance(int id);
 
-    /**
-     * Adds a customer to the service
-     *
-     * @param customer the customer to add
-     */
-    void add(Customer customer);
+
+
+
 }
