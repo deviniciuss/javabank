@@ -1,13 +1,17 @@
 package org.academiadecodigo.javabank.model;
 
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The customer model entity
  */
+@Entity
+@Table(name = "customer")
 public class Customer extends AbstractModel {
 
     private String firstName;
@@ -15,7 +19,14 @@ public class Customer extends AbstractModel {
     private String email;
     private String phone;
 
-    private List<Account> accounts = new ArrayList<>();
+    @OneToMany(
+            cascade = {CascadeType.ALL},
+            orphanRemoval = true,
+            mappedBy = "customer",
+            fetch = FetchType.EAGER
+    )
+
+    private List<AbstractAccount> accounts = new ArrayList<>();
 
     /**
      * Gets the firstName of the customer
@@ -64,7 +75,7 @@ public class Customer extends AbstractModel {
      *
      * @return the accounts
      */
-    public List<Account> getAccounts() {
+    public List<AbstractAccount> getAccounts() {
         return accounts;
     }
 
@@ -73,7 +84,7 @@ public class Customer extends AbstractModel {
      *
      * @param account the account to add
      */
-    public void addAccount(Account account) {
+    public void addAccount(AbstractAccount account) {
         account.setCustomerId(getId());
         accounts.add(account);
     }

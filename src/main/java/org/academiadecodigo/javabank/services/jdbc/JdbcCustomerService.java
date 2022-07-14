@@ -1,11 +1,17 @@
 package org.academiadecodigo.javabank.services.jdbc;
 
+import org.academiadecodigo.javabank.App;
 import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 import org.academiadecodigo.javabank.persistence.ConnectionManager;
 import org.academiadecodigo.javabank.services.AccountService;
 import org.academiadecodigo.javabank.services.CustomerService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
 import java.sql.*;
 import java.util.*;
 
@@ -29,12 +35,12 @@ public class JdbcCustomerService implements CustomerService {
 
         try {
             String query = "SELECT customer.id AS cid, first_name, last_name, phone, email, account.id AS aid " +
-                "FROM customer " +
-                "LEFT JOIN account " +
-                "ON customer.id = account.customer_id " +
-                "WHERE customer.id = ?";
+                    "FROM customer " +
+                    "LEFT JOIN account " +
+                    "ON customer.id = account.customer_id " +
+                    "WHERE customer.id = ?";
 
-            PreparedStatement statement = connectionManager.getConnection().prepareStatement(query);
+            PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
 
@@ -51,7 +57,7 @@ public class JdbcCustomerService implements CustomerService {
                     break;
                 }
 
-                customer.addAccount(account);
+                return null;
             }
 
             statement.close();
@@ -70,11 +76,11 @@ public class JdbcCustomerService implements CustomerService {
 
         try {
             String query = "SELECT customer.id AS cid, first_name, last_name, phone, email, account.id AS aid " +
-                "FROM customer " +
-                "LEFT JOIN account " +
-                "ON customer.id = account.customer_id";
+                    "FROM customer " +
+                    "LEFT JOIN account " +
+                    "ON customer.id = account.customer_id";
 
-            PreparedStatement statement = connectionManager.getConnection().prepareStatement(query);
+            PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -83,10 +89,8 @@ public class JdbcCustomerService implements CustomerService {
                     customers.put(customer.getId(), customer);
                 }
 
-                Account account = accountService.get(resultSet.getInt("aid"));
-                if (account != null) {
-                    customers.get(resultSet.getInt("cid")).addAccount(account);
-                }
+                //AbstractAccount account = accountService.get(resultSet.getInt("aid"));
+
             }
             statement.close();
         } catch (SQLException e) {
@@ -105,7 +109,7 @@ public class JdbcCustomerService implements CustomerService {
             throw new IllegalArgumentException("Customer does not exist");
         }
 
-        List<Account> accounts = customer.getAccounts();
+        List<AbstractAccount> accounts = customer.getAccounts();
 
         if (accounts.size() == 0) {
             return Collections.emptySet();
@@ -129,7 +133,7 @@ public class JdbcCustomerService implements CustomerService {
             throw new IllegalArgumentException("Customer does not exist");
         }
 
-        List<Account> accounts = customer.getAccounts();
+        List<AbstractAccount> accounts = customer.getAccounts();
 
         double balance = 0;
         for (Account account : accounts) {
@@ -140,18 +144,18 @@ public class JdbcCustomerService implements CustomerService {
     }
 
     @Override
-    public void add(Customer customer) {
+    public Customer add(Customer customer) {
 
         if (customer.getId() != null && get(customer.getId()) != null) {
-            return;
+            return null;
         }
 
         try {
 
             String query = "INSERT INTO customer(first_name, last_name, email, phone) " +
-                "VALUES(?, ?, ?, ?)";
+                    "VALUES(?, ?, ?, ?)";
 
-            PreparedStatement statement = connectionManager.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
 
             statement.setString(1, customer.getFirstName());
             statement.setString(2, customer.getLastName());
@@ -171,6 +175,7 @@ public class JdbcCustomerService implements CustomerService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private Customer buildCustomer(ResultSet resultSet) throws SQLException {
@@ -185,4 +190,8 @@ public class JdbcCustomerService implements CustomerService {
 
         return customer;
     }
+
+
+
+
 }

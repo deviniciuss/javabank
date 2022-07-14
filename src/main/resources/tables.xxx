@@ -1,0 +1,28 @@
+mysql> desc account;
++--------------+-------------+------+-----+---------+----------------+
+| Field        | Type        | Null | Key | Default | Extra          |
++--------------+-------------+------+-----+---------+----------------+
+| account_type | varchar(31) | NO   |     | NULL    |                |
+| id           | int         | NO   | PRI | NULL    | auto_increment |
+| creationTime | datetime(6) | YES  |     | NULL    |                |
+| updateTime   | datetime(6) | YES  |     | NULL    |                |
+| version      | int         | YES  |     | NULL    |                |
+| balance      | double      | NO   |     | NULL    |                |
+| customer_id  | int         | YES  | MUL | NULL    |                |
++--------------+-------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> desc customer;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| id           | int          | NO   | PRI | NULL    | auto_increment |
+| creationTime | datetime(6)  | YES  |     | NULL    |                |
+| updateTime   | datetime(6)  | YES  |     | NULL    |                |
+| version      | int          | YES  |     | NULL    |                |
+| email        | varchar(255) | YES  |     | NULL    |                |
+| firstName    | varchar(255) | YES  |     | NULL    |                |
+| lastName     | varchar(255) | YES  |     | NULL    |                |
+| phone        | varchar(255) | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)

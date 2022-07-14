@@ -1,5 +1,6 @@
 package org.academiadecodigo.javabank.services.mock;
 
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 import org.academiadecodigo.javabank.model.account.AccountType;
 import org.academiadecodigo.javabank.services.AccountService;
@@ -29,8 +30,12 @@ public class MockAccountService implements AccountService {
         return accountMap.get(id);
     }
 
+    @Override
+    public AbstractAccount add(AbstractAccount account) {
+        return null;
+    }
+
     /**
-     * @see AccountService#add(Account)
      */
     public void add(Account account) {
 

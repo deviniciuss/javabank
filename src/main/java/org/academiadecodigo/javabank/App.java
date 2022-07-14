@@ -2,12 +2,22 @@ package org.academiadecodigo.javabank;
 
 import org.academiadecodigo.javabank.controller.Controller;
 import org.academiadecodigo.javabank.factories.AccountFactory;
+import org.academiadecodigo.javabank.model.Customer;
 import org.academiadecodigo.javabank.persistence.ConnectionManager;
 import org.academiadecodigo.javabank.services.jdbc.JdbcAccountService;
 import org.academiadecodigo.javabank.services.jdbc.JdbcCustomerService;
 import org.academiadecodigo.javabank.services.AuthServiceImpl;
+import org.academiadecodigo.javabank.services.jpa.JpaAccountService;
+import org.academiadecodigo.javabank.services.jpa.JpaCustomerService;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.RollbackException;
 
 public class App {
+
+
 
     public static void main(String[] args) {
 
@@ -17,11 +27,10 @@ public class App {
 
     private void bootStrap() {
 
-        ConnectionManager connectionManager = new ConnectionManager();
 
         AccountFactory accountFactory = new AccountFactory();
-        JdbcAccountService accountService = new JdbcAccountService(connectionManager, accountFactory);
-        JdbcCustomerService customerService = new JdbcCustomerService(connectionManager);
+        JpaAccountService accountService = new JpaAccountService();
+        JpaCustomerService customerService = new JpaCustomerService();
         customerService.setAccountService(accountService);
 
         Bootstrap bootstrap = new Bootstrap();
@@ -35,6 +44,10 @@ public class App {
         // start application
         controller.init();
 
-        connectionManager.close();
     }
+
+
+
+
+
 }

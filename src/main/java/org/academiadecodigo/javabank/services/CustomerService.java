@@ -46,5 +46,5 @@ public interface CustomerService {
      *
      * @param customer the customer to add
      */
-    void add(Customer customer);
+    Customer add(Customer customer);
 }

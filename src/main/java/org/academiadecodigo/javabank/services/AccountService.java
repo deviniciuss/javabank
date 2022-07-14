@@ -1,5 +1,6 @@
 package org.academiadecodigo.javabank.services;
 
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 
 /**
@@ -20,7 +21,7 @@ public interface AccountService {
      *
      * @param account the account to add
      */
-    void add(Account account);
+    AbstractAccount add(AbstractAccount account);
 
     /**
      * Perform an {@link Account} deposit

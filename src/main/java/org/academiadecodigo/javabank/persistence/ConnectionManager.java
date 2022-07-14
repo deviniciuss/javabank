@@ -1,52 +1,33 @@
 package org.academiadecodigo.javabank.persistence;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionManager {
 
-    private static final String DEFAULT_USER = "root";
-    private static final String DEFAULT_PASS = "";
-    private static final String DEFAULT_HOST = "localhost";
-    private static final String DEFAULT_DB = "javabank";
+    public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("batata"); ;
 
-    private static final String CONNECTOR = "jdbc:mysql:";
+    private  EntityManager em;
 
-    private String dbUrl;
-    private String user;
-    private String pass;
-    private Connection connection;
 
-    public ConnectionManager(String user, String pass, String host, String database) {
-        this.user = user;
-        this.pass = pass;
-        this.dbUrl = CONNECTOR + "//" + host + "/" + database;
-    }
-
-    public ConnectionManager() {
-        this(DEFAULT_USER, DEFAULT_PASS, DEFAULT_HOST, DEFAULT_DB);
-    }
-
-    public Connection getConnection() {
-
-        try {
-            if (connection == null) {
-                connection = DriverManager.getConnection(dbUrl + "?useLegacyDatetimeCode=false&serverTimezone=UTC", user, pass);
-            }
-        } catch (SQLException ex) {
-            System.out.println("Failure to connect to database : " + ex.getMessage());
-        }
-        return connection;
+    public static EntityManager getConnection (){
+        return emf.createEntityManager();
     }
 
     public void close() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException ex) {
-            System.out.println("Failure to close database connections: " + ex.getMessage());
+        if (emf != null) {
+            emf .close();
         }
     }
+
+    public EntityManagerFactory getEMF() {
+        return emf;
+    }
+
+
+
 }

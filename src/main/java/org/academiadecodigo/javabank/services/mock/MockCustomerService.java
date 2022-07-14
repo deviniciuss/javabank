@@ -1,6 +1,7 @@
 package org.academiadecodigo.javabank.services.mock;
 
 import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 import org.academiadecodigo.javabank.services.CustomerService;
 
@@ -45,7 +46,7 @@ public class MockCustomerService implements CustomerService {
     public Set<Integer> listCustomerAccountIds(Integer id) {
 
         Set<Integer> accountIds = new HashSet<>();
-        List<Account> accountList = customerMap.get(id).getAccounts();
+        List<AbstractAccount> accountList = customerMap.get(id).getAccounts();
 
         for (Account account : accountList) {
             accountIds.add(account.getId());
@@ -60,7 +61,7 @@ public class MockCustomerService implements CustomerService {
     @Override
     public double getBalance(int id) {
 
-        List<Account> accounts = customerMap.get(id).getAccounts();
+        List<AbstractAccount> accounts = customerMap.get(id).getAccounts();
 
         double balance = 0;
         for (Account account : accounts) {
@@ -74,12 +75,12 @@ public class MockCustomerService implements CustomerService {
      * @see CustomerService#add(Customer)
      */
     @Override
-    public void add(Customer customer) {
+    public Customer add(Customer customer) {
 
         if (customer.getId() == null) {
             customer.setId(getNextId());
         }
 
-        customerMap.put(customer.getId(), customer);
+         return customerMap.put(customer.getId(), customer);
     }
 }

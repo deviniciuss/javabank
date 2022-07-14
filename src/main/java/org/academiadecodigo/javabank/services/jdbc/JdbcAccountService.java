@@ -1,11 +1,21 @@
 package org.academiadecodigo.javabank.services.jdbc;
 
 import org.academiadecodigo.javabank.factories.AccountFactory;
+import org.academiadecodigo.javabank.model.Customer;
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
 import org.academiadecodigo.javabank.model.account.AccountType;
 import org.academiadecodigo.javabank.persistence.ConnectionManager;
 import org.academiadecodigo.javabank.services.AccountService;
+import org.omg.PortableInterceptor.ACTIVE;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.sql.*;
 
 public class JdbcAccountService implements AccountService {
@@ -26,7 +36,7 @@ public class JdbcAccountService implements AccountService {
         try {
 
             String query = "SELECT id, account_type, customer_id, balance FROM account WHERE id=?";
-            PreparedStatement statement = connectionManager.getConnection().prepareStatement(query);
+            PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
 
             statement.setInt(1, id);
 
@@ -51,8 +61,10 @@ public class JdbcAccountService implements AccountService {
         return account;
     }
 
+
+
     @Override
-    public void add(Account account) {
+    public AbstractAccount add(AbstractAccount account) {
 
 
         try {
@@ -60,7 +72,7 @@ public class JdbcAccountService implements AccountService {
             String query = "INSERT INTO account(account_type, balance, customer_id) " +
                     "VALUES (?, ?, ?)";
 
-            PreparedStatement statement = connectionManager.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
 
             statement.setString(1, account.getAccountType().name());
             statement.setDouble(2, account.getBalance());
@@ -70,8 +82,7 @@ public class JdbcAccountService implements AccountService {
 
             ResultSet generatedKeys = statement.getGeneratedKeys();
 
-            if(generatedKeys.next()) {
-                account.setId(generatedKeys.getInt(1));
+            if(generatedKeys.next()) {account.setId(generatedKeys.getInt(1));
             }
 
             statement.close();
@@ -79,6 +90,7 @@ public class JdbcAccountService implements AccountService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override
@@ -146,7 +158,7 @@ public class JdbcAccountService implements AccountService {
 
         String query = "UPDATE account SET balance = ? WHERE id = ?";
 
-        PreparedStatement statement = connectionManager.getConnection().prepareStatement(query);
+        PreparedStatement statement = (PreparedStatement) connectionManager.getConnection();
 
         statement.setDouble(1, totalBalance);
         statement.setInt(2, id);
@@ -154,4 +166,5 @@ public class JdbcAccountService implements AccountService {
         statement.executeUpdate();
         statement.close();
     }
+
 }
