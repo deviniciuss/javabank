@@ -1,6 +1,9 @@
 package org.academiadecodigo.javabank.services;
 
+import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
+
+import java.util.List;
 
 /**
  * Common interface for account services, provides methods to manage accounts and perform account transactions
@@ -8,43 +11,58 @@ import org.academiadecodigo.javabank.model.account.Account;
 public interface AccountService {
 
     /**
-     * gets an account by its id number
+     * Gets a list of accounts
      *
-     * @param id the id of the account to get
-     * @return the account with the given id
+     * @return the account list
+     */
+    List<Account> list();
+
+    /**
+     * Gets the account
+     *
+     * @param id the account id
+     * @return an account
      */
     Account get(Integer id);
 
     /**
-     * Adds an account to the service
+     * Saves the account
      *
-     * @param account the account to add
+     * @param account to be saved
+     * @return the saved account
      */
-    void add(Account account);
+    Account save(Account account);
 
     /**
-     * Perform an {@link Account} deposit
+     * Deletes as account
+     *
+     * @param id the id of the account to be deleted
+     */
+    void delete(Integer id);
+
+    /**
+     * Perform an {@link AbstractAccount} deposit
      *
      * @param id     the id of the account
      * @param amount the amount to deposit
      */
-    void deposit(int id, double amount);
+    void deposit(Integer id, double amount);
 
     /**
-     * Perform an {@link Account} withdrawal
+     * Perform an {@link AbstractAccount} withdrawal
      *
      * @param id     the id of the account
      * @param amount the amount to withdraw
      */
-    void withdraw(int id, double amount);
+    void withdraw(Integer id, double amount);
 
     /**
-     * Performs a transfer between two {@link Account} if possible
+     * Performs a transfer between two {@link AbstractAccount} if possible
      *
      * @param srcId  the source account id
      * @param dstId  the destination account id
      * @param amount the amount to transfer
      */
-    void transfer(int srcId, int dstId, double amount);
+    void transfer(Integer srcId, Integer dstId, double amount);
 
 }

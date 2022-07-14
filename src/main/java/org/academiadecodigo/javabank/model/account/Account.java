@@ -1,11 +1,8 @@
 package org.academiadecodigo.javabank.model.account;
 
+import org.academiadecodigo.javabank.model.Customer;
 import org.academiadecodigo.javabank.model.Model;
 
-/**
- * Common interface for bank accounts, provides methods to access account
- * information and perform account transactions
- */
 public interface Account extends Model {
 
     /**
@@ -61,17 +58,7 @@ public interface Account extends Model {
      */
     boolean canWithdraw();
 
-    /**
-     * Returns the owning customer's Id
-     *
-     * @return the owning customer's Id
-     */
-    Integer getCustomerId();
-
-    /**
-     * Sets the owning customer id
-     *
-     * @param id the owner customer id
-     */
-    void setCustomerId(Integer id);
+    void setCustomer(Customer customer);
 }
+
+

@@ -11,19 +11,42 @@ import java.util.Set;
 public interface CustomerService {
 
     /**
-     * Gets the customer
-     *
-     * @param id the customer id
-     * @return the customer with the given id
-     */
-    Customer get(Integer id);
-
-    /**
-     * Gets the list of customers
+     * Gets a list of the customers
      *
      * @return the customer list
      */
     List<Customer> list();
+
+    /**
+     * Gets the customer
+     *
+     * @param id the customer id
+     * @return the customer
+     */
+    Customer get(Integer id);
+
+    /**
+     * Saves the customer
+     *
+     * @param customer to be saved
+     * @return the saved customer
+     */
+    Customer save(Customer customer);
+
+    /**
+     * Deletes a customer
+     *
+     * @param id the id of the customer to be deleted
+     */
+    void delete(Integer id);
+
+    /**
+     * Gets the balance of the customer
+     *
+     * @param id the customer id
+     * @return the balance of the customer with the given id
+     */
+    double getBalance(Integer id);
 
     /**
      * Gets the set of customer account ids
@@ -32,19 +55,4 @@ public interface CustomerService {
      * @return the accounts of the given customer id
      */
     Set<Integer> listCustomerAccountIds(Integer id);
-
-    /**
-     * Gets the balance of the customer
-     *
-     * @param id the customer id
-     * @return the balance of the customer with the given id
-     */
-    double getBalance(int id);
-
-    /**
-     * Adds a customer to the service
-     *
-     * @param customer the customer to add
-     */
-    void add(Customer customer);
 }
