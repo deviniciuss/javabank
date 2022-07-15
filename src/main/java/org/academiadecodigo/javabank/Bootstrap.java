@@ -5,8 +5,8 @@ import org.academiadecodigo.javabank.controller.*;
 import org.academiadecodigo.javabank.controller.transaction.DepositController;
 import org.academiadecodigo.javabank.controller.transaction.WithdrawalController;
 import org.academiadecodigo.javabank.factories.AccountFactory;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 import org.academiadecodigo.javabank.services.AccountService;
 import org.academiadecodigo.javabank.services.AuthServiceImpl;
 import org.academiadecodigo.javabank.services.CustomerService;
@@ -23,16 +23,16 @@ public class Bootstrap {
     private AuthServiceImpl authService;
     private CustomerService customerService;
     private AccountService accountService;
-    private TransactionManager tm;
+    private JpaTransactionManager jpaTransactionManager;
 
-    private SessionManager sm;
+    private JpaSessionManager jpaSessionManager;
 
-    public void setTm(TransactionManager tm) {
-        this.tm = tm;
+    public void setJpaTransactionManager(JpaTransactionManager tm) {
+        this.jpaTransactionManager = tm;
     }
 
-    public void setSm(SessionManager sm) {
-        this.sm = sm;
+    public void setJpaSessionManager(JpaSessionManager sm) {
+        this.jpaSessionManager = sm;
     }
 
     /**
@@ -73,11 +73,13 @@ public class Bootstrap {
         Prompt prompt = new Prompt(System.in, System.out);
 
         // wire services
-        tm.setSm(sm);
-
-        customerService.setTm(tm);
-        accountService.setTm(tm);
+        // wire services
+        jpaTransactionManager.setSm(jpaSessionManager);
         authService.setCustomerService(customerService);
+        customerService.setTM(jpaTransactionManager);
+        accountService.setTM(jpaTransactionManager);
+
+
 
         // wire login controller and view
         LoginController loginController = new LoginController();

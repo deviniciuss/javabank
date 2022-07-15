@@ -1,8 +1,8 @@
 package org.academiadecodigo.javabank.services;
 
 import org.academiadecodigo.javabank.model.Customer;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 
 import java.util.List;
 import java.util.Set;
@@ -13,9 +13,7 @@ import java.util.Set;
 public interface CustomerService {
 
 
-   void setTm(TransactionManager tm);
 
-    void setSm(SessionManager sm);
 
     /**
      * Gets a list of the customers
@@ -62,6 +60,9 @@ public interface CustomerService {
      * @return the accounts of the given customer id
      */
     Set<Integer> listCustomerAccountIds(Integer id);
+
+
+    void setTM (JpaTransactionManager jtm);
 
 
 

@@ -2,15 +2,16 @@ package org.academiadecodigo.javabank.persistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
-public class SessionManager {
+public class JpaSessionManager {
     private EntityManagerFactory emf;
     private EntityManager em;
 
-    public SessionManager(EntityManagerFactory emf ) {
+    public JpaSessionManager(EntityManagerFactory emf) {
+
         this.emf = emf;
     }
+
 
     public void startSession() {
 
@@ -33,11 +34,14 @@ public class SessionManager {
         return em;
     }
 
-    public EntityManagerFactory getEmf() {
-        return emf;
+    public void setEmf(EntityManagerFactory emf) {
+        this.emf = emf;
     }
 
-    public EntityManager getEm() {
-        return em;
+
+    public void setEm(EntityManager em) {
+        this.em = em;
     }
+
+
 }

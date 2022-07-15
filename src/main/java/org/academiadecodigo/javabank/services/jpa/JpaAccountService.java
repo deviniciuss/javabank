@@ -1,14 +1,11 @@
 package org.academiadecodigo.javabank.services.jpa;
 
-import org.academiadecodigo.javabank.App;
 import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 import org.academiadecodigo.javabank.services.AccountService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.RollbackException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -21,7 +18,7 @@ import java.util.Optional;
 public class JpaAccountService implements AccountService {
 
 
-    private TransactionManager tm ;
+    private JpaTransactionManager tm ;
 
     private Class<Account> accountClass;
 
@@ -31,15 +28,8 @@ public class JpaAccountService implements AccountService {
         accountClass = Account.class;
     }
 
-    @Override
-    public void setTm(TransactionManager tm) {
 
-    }
 
-    @Override
-    public void setSm(SessionManager sm) {
-
-    }
 
     /**
      * @see AccountService#list()
@@ -50,13 +40,13 @@ public class JpaAccountService implements AccountService {
         try {
             tm.beginRead();
 
-            CriteriaQuery<Account> criteriaQuery = tm.getSm().getCurrentSession().getCriteriaBuilder().createQuery(accountClass);
+            CriteriaQuery<Account> criteriaQuery = tm.getEm().getCriteriaBuilder().createQuery(accountClass);
             Root<Account> root = criteriaQuery.from(accountClass);
-            return tm.getSm().getCurrentSession().createQuery(criteriaQuery).getResultList();
+            return tm.getEm().createQuery(criteriaQuery).getResultList();
 
         } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm() != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -69,12 +59,12 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            return tm.getSm().getCurrentSession().find(accountClass, id);
+            return tm.getEm().find(accountClass, id);
 
 
         } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm() != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -87,20 +77,20 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            tm.getSm().getCurrentSession().getTransaction().begin();
-            Account savedObject = tm.getSm().getCurrentSession().merge(account);
-            tm.getSm().getCurrentSession().getTransaction().commit();
+            tm.getEm().getTransaction().begin();
+            Account savedObject = tm.getEm().merge(account);
+            tm.getEm().getTransaction().commit();
 
             return savedObject;
 
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            tm.getEm().getTransaction().rollback();
             return null;
 
         } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm()  != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -113,17 +103,17 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            tm.getSm().getCurrentSession().getTransaction().begin();
-            tm.getSm().getCurrentSession().remove(tm.getSm().getCurrentSession().find(accountClass, id));
-            tm.getSm().getCurrentSession().getTransaction().commit();
+            tm.getEm().getTransaction().begin();
+            tm.getEm() .remove(tm.getEm().find(accountClass, id));
+            tm.getEm().getTransaction().commit();
 
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            tm.getEm().getTransaction().rollback();
 
         } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm()  != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -136,26 +126,26 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            tm.getSm().getCurrentSession().getTransaction().begin();
+            tm.getEm().getTransaction().begin();
 
-            Optional<AbstractAccount> account = Optional.ofNullable(tm.getSm().getCurrentSession().find(AbstractAccount.class, id));
+            Optional<AbstractAccount> account = Optional.ofNullable(tm.getEm() .find(AbstractAccount.class, id));
 
             if (!account.isPresent()) {
-                tm.getSm().getCurrentSession().getTransaction().rollback();
+                tm.getEm().getTransaction().rollback();
             }
 
             account.orElseThrow(() -> new IllegalArgumentException("invalid account id")).credit(amount);
 
-            tm.getSm().getCurrentSession().getTransaction().commit();
+            tm.getEm().getTransaction().commit();
 
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            tm.getEm().getTransaction().rollback();
 
         } finally {
 
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm() != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -169,26 +159,26 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            tm.getSm().getCurrentSession().getTransaction().begin();
+            tm.getEm().getTransaction().begin();
 
-            Optional<AbstractAccount> account = Optional.ofNullable(tm.getSm().getCurrentSession().find(AbstractAccount.class, id));
+            Optional<AbstractAccount> account = Optional.ofNullable(tm.getEm().find(AbstractAccount.class, id));
 
             if (!account.isPresent()) {
-                tm.getSm().getCurrentSession().getTransaction().rollback();
+                tm.getEm().getTransaction().rollback();
             }
 
             account.orElseThrow(() -> new IllegalArgumentException("invalid account id")).debit(amount);
 
-            tm.getSm().getCurrentSession().getTransaction().commit();
+            tm.getEm().getTransaction().commit();
 
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            tm.getEm().getTransaction().rollback();
 
         } finally {
 
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm() != null) {
+                tm.getEm().close();
             }
         }
     }
@@ -202,13 +192,13 @@ public class JpaAccountService implements AccountService {
 
         try {
 
-            tm.getSm().getCurrentSession().getTransaction().begin();
+            tm.getEm().getTransaction().begin();
 
-            Optional<AbstractAccount> srcAccount = Optional.ofNullable(tm.getSm().getCurrentSession().find(AbstractAccount.class,srcId ));
-            Optional<AbstractAccount> dstAccount = Optional.ofNullable(tm.getSm().getCurrentSession().find(AbstractAccount.class,dstId ));
+            Optional<AbstractAccount> srcAccount = Optional.ofNullable(tm.getEm().find(AbstractAccount.class,srcId ));
+            Optional<AbstractAccount> dstAccount = Optional.ofNullable(tm.getEm().find(AbstractAccount.class,dstId ));
 
             if (!srcAccount.isPresent() || !dstAccount.isPresent()) {
-                tm.getSm().getCurrentSession().getTransaction().rollback();
+                tm.getEm().getTransaction().rollback();
             }
 
             srcAccount.orElseThrow(() -> new IllegalArgumentException("invalid account id"));
@@ -220,17 +210,22 @@ public class JpaAccountService implements AccountService {
                 dstAccount.get().credit(amount);
             }
 
-            tm.getSm().getCurrentSession().getTransaction().commit();
+            tm.getEm().getTransaction().commit();
 
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            tm.getEm().getTransaction().rollback();
 
         } finally {
 
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
+            if (tm.getEm() != null) {
+                tm.getEm().close();
             }
         }
+    }
+
+    @Override
+    public void setTM(JpaTransactionManager jtm) {
+
     }
 }

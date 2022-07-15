@@ -3,8 +3,8 @@ package org.academiadecodigo.javabank.services.mock;
 import org.academiadecodigo.javabank.model.Customer;
 import org.academiadecodigo.javabank.model.Model;
 import org.academiadecodigo.javabank.model.account.Account;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 import org.academiadecodigo.javabank.services.CustomerService;
 
 import java.util.*;
@@ -26,13 +26,12 @@ public class MockCustomerService implements CustomerService {
         return customerMap.isEmpty() ? 1 : Collections.max(customerMap.keySet()) + 1;
     }
 
-    @Override
-    public void setTm(TransactionManager tm) {
+    public void setTm(JpaTransactionManager tm) {
 
     }
 
-    @Override
-    public void setSm(SessionManager sm) {
+
+    public void setSm(JpaSessionManager sm) {
 
     }
 
@@ -100,5 +99,10 @@ public class MockCustomerService implements CustomerService {
         return accounts.stream()
                 .map(Model::getId)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void setTM(JpaTransactionManager jtm) {
+
     }
 }

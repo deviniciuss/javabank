@@ -1,15 +1,12 @@
 package org.academiadecodigo.javabank.services.jpa;
 
-import org.academiadecodigo.javabank.App;
 import org.academiadecodigo.javabank.model.Customer;
 import org.academiadecodigo.javabank.model.Model;
 import org.academiadecodigo.javabank.model.account.Account;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 import org.academiadecodigo.javabank.services.CustomerService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.RollbackException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -23,45 +20,27 @@ import java.util.stream.Collectors;
  */
 public class JpaCustomerService implements CustomerService {
 
-    private TransactionManager tm;
+    private JpaTransactionManager jtm;
     private Class<Customer> customerClass;
-    private EntityManagerFactory emf;
 
 
-    public JpaCustomerService(EntityManagerFactory emf1) {
-
-        this.emf = emf1;
+    public JpaCustomerService() {
         customerClass = Customer.class;
     }
 
-    @Override
-    public void setTm(TransactionManager tm) {
-
-    }
-
-    @Override
-    public void setSm(SessionManager sm) {
-
-    }
 
     /**
      * @see CustomerService#list()
      */
     @Override
     public List<Customer> list() {
+        jtm.beginRead();
+
+        CriteriaQuery<Customer> criteriaQuery = jtm.getEm().getCriteriaBuilder().createQuery(customerClass);
+        Root<Customer> root = criteriaQuery.from(customerClass);
+        return jtm.getEm().createQuery(criteriaQuery).getResultList();
 
 
-        try {
-
-            CriteriaQuery<Customer> criteriaQuery = tm.getSm().getCurrentSession().getCriteriaBuilder().createQuery(customerClass);
-            Root<Customer> root = criteriaQuery.from(customerClass);
-            return tm.getSm().getCurrentSession().createQuery(criteriaQuery).getResultList();
-
-        } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
-            }
-        }
     }
 
     /**
@@ -70,8 +49,9 @@ public class JpaCustomerService implements CustomerService {
     @Override
     public Customer get(Integer id) {
 
-        tm.beginRead();
-        return tm.getEm().find(customerClass, id);
+        jtm.beginRead();
+        jtm.commit();
+        return jtm.getEm().find(customerClass, id);
 
 
     }
@@ -83,25 +63,20 @@ public class JpaCustomerService implements CustomerService {
     public Customer save(Customer customer) {
 
 
+        jtm.beginRead();
+
         try {
-
-            tm.getSm().getCurrentSession().getTransaction().begin();
-            Customer savedObject = tm.getSm().getCurrentSession().merge(customer);
-            tm.getSm().getCurrentSession().getTransaction().commit();
-
-            return savedObject;
-
+            jtm.beginWrite();
+            Customer savedCustomer = jtm.getEm().merge(customer);
+            jtm.commit();
+            return savedCustomer;
         } catch (RollbackException ex) {
-
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            jtm.rollback();
             return null;
-
-        } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
-            }
         }
+
     }
+
 
     /**
      * @see CustomerService#delete(Integer)
@@ -110,21 +85,18 @@ public class JpaCustomerService implements CustomerService {
     public void delete(Integer id) {
 
 
+        jtm.beginRead();
         try {
-
-            tm.getSm().getCurrentSession().getTransaction().begin();
-            tm.getSm().getCurrentSession().remove(tm.getSm().getCurrentSession().find(customerClass, id));
-            tm.getSm().getCurrentSession().getTransaction().commit();
-
+            jtm.beginWrite();
+            jtm.getEm().remove(jtm.getEm().find(customerClass, id));
+            jtm.commit();
         } catch (RollbackException ex) {
 
-            tm.getSm().getCurrentSession().getTransaction().rollback();
+            jtm.rollback();
 
-        } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
-            }
         }
+
+
     }
 
     /**
@@ -132,22 +104,16 @@ public class JpaCustomerService implements CustomerService {
      */
     @Override
     public double getBalance(Integer id) {
+        jtm.beginRead();
+
+        Customer customer = Optional.ofNullable(jtm.getEm().find(customerClass, id))
+                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+
+        return customer.getAccounts().stream()
+                .mapToDouble(Account::getBalance)
+                .sum();
 
 
-        try {
-
-            Customer customer = Optional.ofNullable(tm.getSm().getCurrentSession().find(customerClass, id))
-                    .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
-
-            return customer.getAccounts().stream()
-                    .mapToDouble(Account::getBalance)
-                    .sum();
-
-        } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
-            }
-        }
     }
 
     /**
@@ -156,21 +122,24 @@ public class JpaCustomerService implements CustomerService {
     @Override
     public Set<Integer> listCustomerAccountIds(Integer id) {
 
+        jtm.beginRead();
 
-        try {
+        Customer customer = Optional.ofNullable(jtm.getEm().find(customerClass, id))
+                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
-            Customer customer = Optional.ofNullable(tm.getSm().getCurrentSession().find(customerClass, id))
-                    .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+        return customer.getAccounts().stream()
+                .map(Model::getId)
+                .collect(Collectors.toSet());
 
-            return customer.getAccounts().stream()
-                    .map(Model::getId)
-                    .collect(Collectors.toSet());
 
-        } finally {
-            if (tm.getSm().getCurrentSession() != null) {
-                tm.getSm().getCurrentSession().close();
-            }
-        }
+    }
 
+    @Override
+    public void setTM(JpaTransactionManager jtm) {
+
+    }
+
+    public void setJtm(JpaTransactionManager jtm) {
+        this.jtm = jtm;
     }
 }

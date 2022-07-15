@@ -2,8 +2,8 @@ package org.academiadecodigo.javabank.services;
 
 import org.academiadecodigo.javabank.model.account.AbstractAccount;
 import org.academiadecodigo.javabank.model.account.Account;
-import org.academiadecodigo.javabank.persistence.SessionManager;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
+import org.academiadecodigo.javabank.persistence.JpaSessionManager;
+import org.academiadecodigo.javabank.persistence.JpaTransactionManager;
 
 import java.util.List;
 
@@ -13,9 +13,7 @@ import java.util.List;
 public interface AccountService {
 
 
-     void setTm(TransactionManager tm);
 
-     void setSm(SessionManager sm);
 
     /**
      * Gets a list of accounts
@@ -71,5 +69,7 @@ public interface AccountService {
      * @param amount the amount to transfer
      */
     void transfer(Integer srcId, Integer dstId, double amount);
+    void setTM (JpaTransactionManager jtm);
+
 
 }
