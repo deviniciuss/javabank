@@ -1,67 +1,27 @@
 package org.academiadecodigo.javabank.services.mock;
 
+import org.academiadecodigo.javabank.model.AbstractModel;
 import org.academiadecodigo.javabank.model.Customer;
-import org.academiadecodigo.javabank.model.Model;
+import org.academiadecodigo.javabank.model.Recipient;
 import org.academiadecodigo.javabank.model.account.Account;
 import org.academiadecodigo.javabank.services.CustomerService;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * A mock {@link CustomerService} implementation
  */
-public class MockCustomerService implements CustomerService {
-
-    private Map<Integer, Customer> customerMap = new HashMap<>();
-
-    /**
-     * Gets the next customer id
-     *
-     * @return the customer id
-     */
-    private Integer getNextId() {
-        return customerMap.isEmpty() ? 1 : Collections.max(customerMap.keySet()) + 1;
-    }
-
-    /**
-     * @see CustomerService#list()
-     */
-    @Override
-    public List<Customer> list() {
-        return new ArrayList<>(customerMap.values());
-    }
+public class MockCustomerService extends AbstractMockService<Customer> implements CustomerService {
 
     /**
      * @see CustomerService#get(Integer)
      */
     @Override
     public Customer get(Integer id) {
-        return customerMap.get(id);
-    }
-
-    /**
-     * @see CustomerService#save(Customer)
-     */
-    @Override
-    public Customer save(Customer customer) {
-
-        if (customer.getId() == null) {
-            customer.setId(getNextId());
-        }
-
-        customerMap.put(customer.getId(), customer);
-
-        return customer;
-
-    }
-
-    /**
-     * @see CustomerService#delete(Integer)
-     */
-    @Override
-    public void delete(Integer id) {
-        customerMap.remove(id);
+        return modelMap.get(id);
     }
 
     /**
@@ -70,7 +30,7 @@ public class MockCustomerService implements CustomerService {
     @Override
     public double getBalance(Integer id) {
 
-        List<Account> accounts = customerMap.get(id).getAccounts();
+        List<Account> accounts = modelMap.get(id).getAccounts();
 
         return accounts.stream()
                 .mapToDouble(Account::getBalance)
@@ -83,10 +43,18 @@ public class MockCustomerService implements CustomerService {
     @Override
     public Set<Integer> listCustomerAccountIds(Integer id) {
 
-        List<Account> accounts = customerMap.get(id).getAccounts();
+        List<Account> accounts = modelMap.get(id).getAccounts();
 
         return accounts.stream()
-                .map(Model::getId)
+                .map(AbstractModel::getId)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * @see CustomerService#listRecipients(Integer)
+     */
+    @Override
+    public List<Recipient> listRecipients(Integer id) {
+        return modelMap.get(id).getRecipients();
     }
 }

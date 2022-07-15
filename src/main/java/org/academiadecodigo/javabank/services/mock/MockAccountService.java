@@ -1,71 +1,42 @@
 package org.academiadecodigo.javabank.services.mock;
 
 import org.academiadecodigo.javabank.model.account.Account;
+import org.academiadecodigo.javabank.model.account.AccountType;
 import org.academiadecodigo.javabank.services.AccountService;
-
-import java.util.*;
 
 /**
  * A mock {@link AccountService} implementation
  */
-public class MockAccountService implements AccountService {
-
-    protected Map<Integer, Account> accountMap = new HashMap<>();
-
-    /**
-     * Gets the next account id
-     *
-     * @return the account id
-     */
-    private Integer getNextId() {
-        return accountMap.isEmpty() ? 1 : Collections.max(accountMap.keySet()) + 1;
-    }
-
-    /**
-     * @see AccountService#list()
-     */
-    @Override
-    public List<Account> list() {
-        return new ArrayList<>(accountMap.values());
-    }
+public class MockAccountService extends AbstractMockService<Account> implements AccountService {
 
     /**
      * @see AccountService#get(Integer)
      */
     @Override
     public Account get(Integer id) {
-        return accountMap.get(id);
+        return modelMap.get(id);
     }
 
     /**
-     * @see AccountService#save(Account)
+     * @see AccountService#add(Account)
      */
     @Override
-    public Account save(Account account) {
+    public Integer add(Account account) {
 
         if (account.getId() == null) {
             account.setId(getNextId());
         }
 
-        accountMap.put(account.getId(), account);
+        modelMap.put(account.getId(), account);
 
-        return account;
-
-    }
-
-    /**
-     * @see AccountService#delete(Integer)
-     */
-    @Override
-    public void delete(Integer id) {
-        accountMap.remove(id);
+        return account.getId();
     }
 
     /**
      * @see AccountService#deposit(Integer, double)
      */
     public void deposit(Integer id, double amount) {
-        accountMap.get(id).credit(amount);
+        modelMap.get(id).credit(amount);
     }
 
     /**
@@ -73,13 +44,12 @@ public class MockAccountService implements AccountService {
      */
     public void withdraw(Integer id, double amount) {
 
-        Account account = accountMap.get(id);
-
-        if (!account.canWithdraw()) {
+        Account account = modelMap.get(id);
+        if (account.getAccountType() == AccountType.SAVINGS) {
             return;
         }
 
-        accountMap.get(id).debit(amount);
+        modelMap.get(id).debit(amount);
     }
 
     /**
@@ -87,8 +57,8 @@ public class MockAccountService implements AccountService {
      */
     public void transfer(Integer srcId, Integer dstId, double amount) {
 
-        Account srcAccount = accountMap.get(srcId);
-        Account dstAccount = accountMap.get(dstId);
+        Account srcAccount = modelMap.get(srcId);
+        Account dstAccount = modelMap.get(dstId);
 
         // make sure transaction can be performed
         if (srcAccount.canDebit(amount) && dstAccount.canCredit(amount)) {

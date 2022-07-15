@@ -8,7 +8,7 @@ import java.io.PrintStream;
 
 import static org.mockito.Mockito.*;
 
-public class NewAccountViewTest {
+public class NewAccountControllerTest {
 
     private NewAccountView naView;
     private NewAccountController naCtrl;
