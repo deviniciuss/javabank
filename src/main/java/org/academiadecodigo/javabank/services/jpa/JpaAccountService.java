@@ -123,12 +123,12 @@ public class JpaAccountService implements AccountService {
      */
     public void deposit(Integer id, double amount) {
 
-
+        tm.beginRead();
         try {
 
             tm.getEm().getTransaction().begin();
 
-            Optional<AbstractAccount> account = Optional.ofNullable(tm.getEm() .find(AbstractAccount.class, id));
+            Optional<Account> account = Optional.ofNullable(tm.getEm() .find(AbstractAccount.class, id));
 
             if (!account.isPresent()) {
                 tm.getEm().getTransaction().rollback();
@@ -142,11 +142,6 @@ public class JpaAccountService implements AccountService {
 
             tm.getEm().getTransaction().rollback();
 
-        } finally {
-
-            if (tm.getEm() != null) {
-                tm.getEm().close();
-            }
         }
     }
 
@@ -225,7 +220,10 @@ public class JpaAccountService implements AccountService {
     }
 
     @Override
-    public void setTM(JpaTransactionManager jtm) {
+    public void setJtm(JpaTransactionManager jtm) {
+        this.tm = jtm;
 
     }
+
+
 }

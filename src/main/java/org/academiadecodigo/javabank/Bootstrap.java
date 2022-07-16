@@ -76,8 +76,8 @@ public class Bootstrap {
         // wire services
         jpaTransactionManager.setSm(jpaSessionManager);
         authService.setCustomerService(customerService);
-        customerService.setTM(jpaTransactionManager);
-        accountService.setTM(jpaTransactionManager);
+        customerService.setJtm(jpaTransactionManager);
+        accountService.setJtm(jpaTransactionManager);
 
 
 

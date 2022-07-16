@@ -102,7 +102,9 @@ public class MockCustomerService implements CustomerService {
     }
 
     @Override
-    public void setTM(JpaTransactionManager jtm) {
+    public void setJtm(JpaTransactionManager jtm) {
 
     }
+
+
 }

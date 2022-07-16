@@ -62,7 +62,7 @@ public interface CustomerService {
     Set<Integer> listCustomerAccountIds(Integer id);
 
 
-    void setTM (JpaTransactionManager jtm);
+    void setJtm (JpaTransactionManager jtm);
 
 
 

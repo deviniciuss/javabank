@@ -69,7 +69,7 @@ public interface AccountService {
      * @param amount the amount to transfer
      */
     void transfer(Integer srcId, Integer dstId, double amount);
-    void setTM (JpaTransactionManager jtm);
+    void setJtm (JpaTransactionManager jtm);
 
 
 }

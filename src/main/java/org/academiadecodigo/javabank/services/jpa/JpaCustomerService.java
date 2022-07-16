@@ -134,11 +134,8 @@ public class JpaCustomerService implements CustomerService {
 
     }
 
+
     @Override
-    public void setTM(JpaTransactionManager jtm) {
-
-    }
-
     public void setJtm(JpaTransactionManager jtm) {
         this.jtm = jtm;
     }

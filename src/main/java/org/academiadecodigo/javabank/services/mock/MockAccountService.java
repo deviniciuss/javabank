@@ -109,7 +109,8 @@ public class MockAccountService implements AccountService {
     }
 
     @Override
-    public void setTM(JpaTransactionManager jtm) {
+    public void setJtm(JpaTransactionManager jtm) {
 
     }
+
 }
