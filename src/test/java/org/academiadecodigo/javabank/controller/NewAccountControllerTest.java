@@ -37,10 +37,10 @@ public class NewAccountControllerTest {
         when(authService.getAccessingCustomer()).thenReturn(customer);
 
         // wire them all
+        newAccountController.setAccountFactory(accountFactory);
         newAccountController.setAccountService(accountService);
         newAccountController.setAuthService(authService);
         newAccountController.setView(view);
-        newAccountController.setAccountFactory(accountFactory);
 
     }
 
@@ -54,6 +54,7 @@ public class NewAccountControllerTest {
         Account account = mock(Account.class);
         when(account.getId()).thenReturn(id);
         when(accountFactory.createAccount(any(AccountType.class))).thenReturn(account);
+        when(accountService.add(account)).thenReturn(id);
 
         // init the controller (which creates a new account)
         newAccountController.init();
@@ -70,6 +71,9 @@ public class NewAccountControllerTest {
 
         // check if new account ID matches mock account's ID
         assertEquals(id, (int) newAccountController.getNewAccountId());
+        int newAccountId = newAccountController.getNewAccountId();
+
+        assertEquals(newAccountId, id);
 
     }
 }
