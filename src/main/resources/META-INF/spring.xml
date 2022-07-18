@@ -1,0 +1,145 @@
+<beans>
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+    <!-- c3p0 database connection pool management -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/ac"/>
+        <property name="user" value="root"/>
+
+        <!-- c3p0 database connection pool management properties -->
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="acquireIncrement" value="1"/>
+        <property name="maxStatements" value="0"/>
+
+        <!-- destroy idle pool after 300ms -->
+        <property name="idleConnectionTestPeriod" value="300"/>
+
+        <!-- destroy db connection if it fails to login after 7200ms -->
+        <property name="loginTimeout" value="7200"/>
+
+    </bean>
+
+    <!-- spring jpa entity manager factory configuration -->
+    <bean id="emFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="org.academiadecodigo.bootcamp.model"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+        <property name="jpaProperties">
+            <map>
+                <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+                <entry key="hibernate.show_sql" value="true"/>
+                <!-- WARNING: Will re-create the database schema, causing data loss -->
+                <entry key="hibernate.hbm2ddl.auto" value="create"/>
+            </map>
+        </property>
+    </bean>
+    <!--  // attach all input to standard i/o -->
+    Prompt prompt = new Prompt(System.in, System.out);
+
+    <bean id="loginController" class="org.academiadecodigo.javabank.controller.LoginController"></bean>
+
+
+    <bean id="authService" class="org.academiadecodigo.javabank.services.AuthServiceImpl">
+        <property name="customerService" ref="customerService"/>
+    </bean>
+
+    <bean id="loginController" class="org.academiadecodigo.javabank.controller.LoginController">
+        <property name="nextController" ref="controller"/>
+        <property name="authService" ref="authService"/>
+        <property name="nextController" ref="mainController"/>
+
+    </bean>
+
+    <bean id="loginView" class="org.academiadecodigo.javabank.view.LoginView">
+        <property name="loginController" ref="loginController"/>
+        <property name="prompt" ref="prompt"/>
+    </bean>
+
+    <bean id="loginController.SetView" class="org.academiadecodigo.javabank.controller.LoginController">
+        <property name="loginView" ref="loginView"/>
+    </bean>
+
+
+    <bean id="mainController" class="org.academiadecodigo.javabank.controller.MainController">
+        <property name="mainView" ref="mainView"/>
+        <property name ="authService" ref="authService"/>
+    </bean>
+    <bean id="mainView" class="org.academiadecodigo.javabank.view.MainView">
+        <property name="prompt" ref="prompt"/>
+        <property name="mainController" ref="mainController"/>
+    </bean>
+
+    <bean name="balanceController" class="org.academiadecodigo.javabank.controller.BalanceController">
+        <property name="balanceView" ref="balanceView"/>
+        <property name="authService" ref="authService"/>
+        <property name="customerService" ref="customerService"/>
+
+
+    </bean>
+
+    <bean name="balanceView" class="org.academiadecodigo.javabank.view.BalanceView">
+        <property name="balanceController" ref="balanceController"/>
+
+    </bean>
+
+    <bean name="customerService" class="org.academiadecodigo.javabank.services.CustomerServiceImpl">
+
+    </bean>
+
+    <bean name="newAccountView" class="org.academiadecodigo.javabank.view.NewAccountView">
+
+    </bean>
+    <bean name="newAccountController" class="org.academiadecodigo.javabank.controller.NewAccountController">
+        <property name="accountService" ref="accountService"/>
+        <property name="authService" ref="authService"/>
+        <property name="newAccountView" ref="newAccountView"/>
+
+    </bean>
+
+
+
+    newAccountController.setAccountFactory(new AccountFactory());
+    newAccountView.setNewAccountController(newAccountController);
+
+    // wire account transactions controllers and views
+    DepositController depositController = new DepositController();
+    WithdrawalController withdrawalController = new WithdrawalController();
+    AccountTransactionView depositView = new AccountTransactionView();
+    AccountTransactionView withdrawView = new AccountTransactionView();
+    depositController.setAuthService(authService);
+    depositController.setAccountService(accountService);
+    depositController.setCustomerService(customerService);
+    depositController.setView(depositView);
+    withdrawalController.setAuthService(authService);
+    withdrawalController.setCustomerService(customerService);
+    withdrawalController.setAccountService(accountService);
+    withdrawalController.setView(withdrawView);
+    depositView.setPrompt(prompt);
+    depositView.setTransactionController(depositController);
+    withdrawView.setPrompt(prompt);
+    withdrawView.setTransactionController(withdrawalController);
+
+    // wire recipients controller and view
+    RecipientsController recipientsController = new RecipientsController();
+    RecipientsView recipientsView = new RecipientsView();
+    recipientsView.setRecipientsController(recipientsController);
+    recipientsController.setView(recipientsView);
+    recipientsController.setAuthService(authService);
+    recipientsController.setCustomerService(customerService);
+
+    // setup the controller map
+    Map<Integer, Controller> controllerMap = new HashMap<>();
+    controllerMap.put(UserOptions.GET_BALANCE.getOption(), balanceController);
+    controllerMap.put(UserOptions.OPEN_ACCOUNT.getOption(), newAccountController);
+    controllerMap.put(UserOptions.DEPOSIT.getOption(), depositController);
+    controllerMap.put(UserOptions.WITHDRAW.getOption(), withdrawalController);
+    controllerMap.put(UserOptions.LIST_RECIPIENTS.getOption(), recipientsController);
+
+    mainController.setControllerMap(controllerMap);
+
+    return loginController;-->
+</beans>

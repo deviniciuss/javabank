@@ -1,5 +1,6 @@
 package org.academiadecodigo.javabank;
 
+import com.sun.xml.internal.bind.CycleRecoverable;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.javabank.controller.*;
 import org.academiadecodigo.javabank.controller.transaction.DepositController;
@@ -9,6 +10,8 @@ import org.academiadecodigo.javabank.services.AccountService;
 import org.academiadecodigo.javabank.services.AuthServiceImpl;
 import org.academiadecodigo.javabank.services.CustomerService;
 import org.academiadecodigo.javabank.view.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +20,9 @@ import java.util.Map;
  * Responsible for wiring the objects dependencies
  */
 public class Bootstrap {
-
+    ApplicationContext context = new ClassPathXmlApplicationContext(
+            new String[] {"spring.xml"}
+    );
     private AuthServiceImpl authService;
     private CustomerService customerService;
     private AccountService accountService;
@@ -63,7 +68,7 @@ public class Bootstrap {
         authService.setCustomerService(customerService);
 
         // wire login controller and view
-        LoginController loginController = new LoginController();
+        LoginController loginController = context.getBean("loginController", LoginController.class); //new LoginController();
         LoginView loginView = new LoginView();
         loginController.setView(loginView);
         loginController.setAuthService(authService);
