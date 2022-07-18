@@ -1,5 +1,6 @@
 *.iml
 out
 .idea
-build
 target
+dependency-reduced-pom.xml
+*.db
