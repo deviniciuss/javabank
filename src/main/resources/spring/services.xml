@@ -8,7 +8,6 @@
     </bean>
 
     <bean id="customerService" class="org.academiadecodigo.javabank.services.CustomerServiceImpl">
-
         <property name="customerDao" ref="customerDao"/>
     </bean>
 

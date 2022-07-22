@@ -3,7 +3,10 @@ package org.academiadecodigo.javabank.services;
 import org.academiadecodigo.javabank.persistence.model.account.Account;
 import org.academiadecodigo.javabank.persistence.model.account.CheckingAccount;
 import org.academiadecodigo.javabank.persistence.model.account.SavingsAccount;
+<<<<<<< HEAD
 import org.academiadecodigo.javabank.persistence.TransactionException;
+=======
+>>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
 import org.academiadecodigo.javabank.persistence.dao.AccountDao;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,18 +16,15 @@ import static org.mockito.Mockito.*;
 
 public class AccountServiceImplTest {
 
-    private TransactionManager tx;
     private AccountDao accountDao;
     private AccountServiceImpl accountService;
 
     @Before
     public void setup() {
 
-        tx = mock(JpaTransactionManager.class);
         accountDao = mock(AccountDao.class);
 
         accountService = new AccountServiceImpl();
-        accountService.setTransactionManager(tx);
         accountService.setAccountDao(accountDao);
 
     }
@@ -42,9 +42,6 @@ public class AccountServiceImplTest {
         int id = accountService.add(new CheckingAccount());
 
         // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         assertEquals(fakeId, id);
 
 
@@ -63,26 +60,7 @@ public class AccountServiceImplTest {
         int id = accountService.add(new SavingsAccount());
 
         // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         assertEquals(fakeId, id);
-    }
-
-    @Test
-    public void testAddFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(accountDao).saveOrUpdate(any(Account.class));
-
-        // exercise
-        accountService.add(new SavingsAccount());
-
-        // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, never()).commit();
-        verify(tx, times(1)).rollback();
-
     }
 
     @Test
@@ -98,9 +76,6 @@ public class AccountServiceImplTest {
         accountService.deposit(fakeId, amount);
 
         // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         verify(fakeAccount, times(1)).credit(amount);
         verify(accountDao, times(1)).saveOrUpdate(fakeAccount);
     }
@@ -114,27 +89,6 @@ public class AccountServiceImplTest {
         // exercise
         accountService.deposit(1, 100);
 
-        // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
-
-    }
-
-    @Test
-    public void testDepositFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(accountDao).findById(anyInt());
-
-        // exercise
-        accountService.deposit(1, 100);
-
-        // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
-
     }
 
     @Test
@@ -143,18 +97,13 @@ public class AccountServiceImplTest {
         // setup
         int fakeId = 1;
         double amount = 100.5;
-        Account fakeAccount = mock(Account.class);
+        Account fakeAccount = spy(Account.class);
         when(accountDao.findById(fakeId)).thenReturn(fakeAccount);
-
-        when(fakeAccount.canWithdraw()).thenReturn(true);
 
         // exercise
         accountService.withdraw(fakeId, amount);
 
         // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         verify(fakeAccount, times(1)).debit(amount);
         verify(accountDao, times(1)).saveOrUpdate(fakeAccount);
     }
@@ -167,26 +116,6 @@ public class AccountServiceImplTest {
 
         // exercise
         accountService.withdraw(1, 100);
-
-        // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-
-    }
-
-    @Test
-    public void testWithdrawFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(accountDao).findById(anyInt());
-
-        // exercise
-        accountService.withdraw(1, 100);
-
-        // verify
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
 
     }
 
@@ -208,9 +137,6 @@ public class AccountServiceImplTest {
         accountService.transfer(fakeSrcId, fakeDstId, amount);
 
         // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         verify(accountDao, times(1)).saveOrUpdate(fakeSrcAccount);
         verify(accountDao, times(1)).saveOrUpdate(fakeDstAccount);
         verify(fakeSrcAccount, times(1)).canDebit(amount);
@@ -238,9 +164,6 @@ public class AccountServiceImplTest {
         accountService.transfer(fakeSrcId, fakeDstId, amount);
 
         // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         verify(accountDao, times(1)).saveOrUpdate(fakeSrcAccount);
         verify(accountDao, times(1)).saveOrUpdate(fakeDstAccount);
         verify(fakeSrcAccount, times(1)).canDebit(amount);
@@ -265,9 +188,6 @@ public class AccountServiceImplTest {
         accountService.transfer(fakeSrcId, fakeDstId, amount);
 
         // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).commit();
-        verify(tx, never()).rollback();
         verify(accountDao, times(1)).saveOrUpdate(fakeSrcAccount);
         verify(accountDao, times(1)).saveOrUpdate(fakeDstAccount);
         verify(fakeDstAccount, times(1)).canCredit(amount);
@@ -288,11 +208,6 @@ public class AccountServiceImplTest {
         // exercise
         accountService.transfer(fakeSrcId, fakeDstId, amount);
 
-        // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
-
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -309,25 +224,6 @@ public class AccountServiceImplTest {
         // exercise
         accountService.transfer(fakeSrcId, fakeDstId, amount);
 
-        // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
-
     }
 
-    @Test
-    public void testTransferFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(accountDao).findById(anyInt());
-
-        // exercise
-        accountService.transfer(1, 2, 100);
-
-        // validate
-        verify(tx, times(1)).beginWrite();
-        verify(tx, times(1)).rollback();
-        verify(tx, never()).commit();
-    }
 }

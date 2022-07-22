@@ -1,15 +1,16 @@
 package org.academiadecodigo.javabank.services;
 
 import org.academiadecodigo.javabank.persistence.model.Customer;
-import org.academiadecodigo.javabank.persistence.model.Recipient;
 import org.academiadecodigo.javabank.persistence.model.account.Account;
 import org.academiadecodigo.javabank.persistence.model.account.CheckingAccount;
+<<<<<<< HEAD
 import org.academiadecodigo.javabank.persistence.TransactionException;
+=======
+>>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
 import org.academiadecodigo.javabank.persistence.dao.CustomerDao;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -21,18 +22,15 @@ public class CustomerServiceImplTest {
 
     private static final double DOUBLE_PRECISION = 0.1;
 
-    private TransactionManager tx;
     private CustomerDao customerDao;
     private CustomerServiceImpl customerService;
 
     @Before
     public void setup() {
 
-        tx = mock(TransactionManager.class);
         customerDao = mock(CustomerDao.class);
 
         customerService = new CustomerServiceImpl();
-        customerService.setTransactionManager(tx);
         customerService.setCustomerDao(customerDao);
 
     }
@@ -49,24 +47,7 @@ public class CustomerServiceImplTest {
         Customer customer = customerService.get(fakeId);
 
         // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
         assertEquals(fakeCustomer, customer);
-    }
-
-    @Test(expected = TransactionException.class)
-    public void testGetFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(customerDao).findById(anyInt());
-
-        // exercise
-        customerService.get(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-
     }
 
     @Test
@@ -87,8 +68,6 @@ public class CustomerServiceImplTest {
         double result = customerService.getBalance(fakeId);
 
         // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
         assertEquals(a1.getBalance() + a2.getBalance(), result, DOUBLE_PRECISION);
     }
 
@@ -100,24 +79,6 @@ public class CustomerServiceImplTest {
 
         // exercise
         customerService.getBalance(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-    }
-
-    @Test(expected = TransactionException.class)
-    public void testGetBalanceFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(customerDao).findById(anyInt());
-
-        // exercise
-        customerService.getBalance(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
 
     }
 
@@ -141,8 +102,6 @@ public class CustomerServiceImplTest {
         Set<Integer> accountIds = customerService.listCustomerAccountIds(fakeId);
 
         // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
         assertNotNull(accountIds);
         assertEquals(fakeCustomer.getAccounts().size(), accountIds.size());
         assertTrue(accountIds.contains(a1.getId()));
@@ -158,76 +117,6 @@ public class CustomerServiceImplTest {
         // exercise
         customerService.listCustomerAccountIds(1);
 
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-
     }
 
-    @Test(expected = TransactionException.class)
-    public void testListCustomerAccountIdsFail() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(customerDao).findById(anyInt());
-
-        // exercise
-        customerService.listCustomerAccountIds(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-
-    }
-
-    @Test
-    public void testListRecipients() {
-
-        // setup
-        int fakeId = 9999;
-        Recipient r1 = new Recipient();
-        Recipient r2 = new Recipient();
-        Customer fakeCustomer = new Customer();
-        fakeCustomer.addRecipient(r1);
-        fakeCustomer.addRecipient(r2);
-        when(customerDao.findById(fakeId)).thenReturn(fakeCustomer);
-
-        // exercise
-        List<Recipient> recipients = customerService.listRecipients(fakeId);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-        assertNotNull(recipients);
-        assertEquals(fakeCustomer.getRecipients().size(), recipients.size());
-        assertTrue(recipients.contains(r1));
-        assertTrue(recipients.contains(r2));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testListRecipientsInvalidId() {
-
-        // setup
-        when(customerDao.findById(anyInt())).thenReturn(null);
-
-        // exercise
-        customerService.listRecipients(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-    }
-
-    @Test(expected = TransactionException.class)
-    public void testListRecipientsFails() {
-
-        // setup
-        doThrow(new TransactionException(new RuntimeException())).when(customerDao).findById(anyInt());
-
-        // exercise
-        customerService.listRecipients(1);
-
-        // verify
-        verify(tx, times(1)).beginRead();
-        verify(tx, times(1)).commit();
-    }
 }

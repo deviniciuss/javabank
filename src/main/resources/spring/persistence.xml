@@ -9,19 +9,12 @@
     <import resource="./persistence/persistence-prod.xml"/>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
+
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="emFactory"/>
+        <property name="entityManagerFactory" ref="emFactory" />
     </bean>
 
-    <bean id="sessionManager" class="org.academiadecodigo.javabank.persistence.jpa.JpaSessionManager"/>
-
-
-    <bean id="accountDao" class="org.academiadecodigo.javabank.persistence.dao.jpa.JpaAccountDao">
-        <property name="sm" ref="sessionManager"/>
-    </bean>
-
-    <bean id="customerDao" class="org.academiadecodigo.javabank.persistence.dao.jpa.JpaCustomerDao">
-        <property name="sm" ref="sessionManager"/>
-    </bean>
+    <bean id="accountDao" class="org.academiadecodigo.javabank.persistence.dao.jpa.JpaAccountDao"/>
+    <bean id="customerDao" class="org.academiadecodigo.javabank.persistence.dao.jpa.JpaCustomerDao"/>
 
 </beans>
