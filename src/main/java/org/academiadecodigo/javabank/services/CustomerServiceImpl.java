@@ -4,9 +4,9 @@ import org.academiadecodigo.javabank.persistence.model.AbstractModel;
 import org.academiadecodigo.javabank.persistence.model.Customer;
 import org.academiadecodigo.javabank.persistence.model.Recipient;
 import org.academiadecodigo.javabank.persistence.model.account.Account;
-import org.academiadecodigo.javabank.persistence.TransactionManager;
 import org.academiadecodigo.javabank.persistence.dao.CustomerDao;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  */
 public class CustomerServiceImpl implements CustomerService {
 
-    private TransactionManager tx;
     private CustomerDao customerDao;
 
     /**
@@ -23,6 +22,7 @@ public class CustomerServiceImpl implements CustomerService {
      *
      * @param customerDao the account DAO to set
      */
+    @Transactional
     public void setCustomerDao(CustomerDao customerDao) {
         this.customerDao = customerDao;
     }
@@ -32,87 +32,71 @@ public class CustomerServiceImpl implements CustomerService {
      *
      * @param tx the transaction manager to set
      */
-    public void setTransactionManager(TransactionManager tx) {
-        this.tx = tx;
-    }
+
 
     /**
      * @see CustomerService#get(Integer)
      */
+    @Transactional
+
     @Override
     public Customer get(Integer id) {
 
-        try {
 
-            tx.beginRead();
-            return customerDao.findById(id);
+        return customerDao.findById(id);
 
-        } finally {
-            tx.commit();
-        }
     }
 
     /**
      * @see CustomerService#getBalance(Integer)
      */
+    @Transactional
+
     @Override
     public double getBalance(Integer id) {
 
-        try {
 
-            tx.beginRead();
+        Customer customer = Optional.ofNullable(customerDao.findById(id))
+                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
-            Customer customer = Optional.ofNullable(customerDao.findById(id))
-                    .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+        return customer.getAccounts().stream()
+                .mapToDouble(Account::getBalance)
+                .sum();
 
-            return customer.getAccounts().stream()
-                    .mapToDouble(Account::getBalance)
-                    .sum();
-
-        } finally {
-            tx.commit();
-        }
     }
 
     /**
      * @see CustomerService#listCustomerAccountIds(Integer)
      */
+    @Transactional
+
     @Override
     public Set<Integer> listCustomerAccountIds(Integer id) {
 
-        try {
 
-            tx.beginRead();
+        Customer customer = Optional.ofNullable(customerDao.findById(id))
+                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
-            Customer customer = Optional.ofNullable(customerDao.findById(id))
-                    .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+        return customer.getAccounts().stream()
+                .map(AbstractModel::getId)
+                .collect(Collectors.toSet());
 
-            return customer.getAccounts().stream()
-                    .map(AbstractModel::getId)
-                    .collect(Collectors.toSet());
 
-        } finally {
-            tx.commit();
-        }
     }
 
     /**
      * @see CustomerService#listRecipients(Integer)
      */
+    @Transactional
+
     @Override
     public List<Recipient> listRecipients(Integer id) {
 
-        try {
 
-            tx.beginRead();
+        Customer customer = Optional.ofNullable(customerDao.findById(id))
+                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
-            Customer customer = Optional.ofNullable(customerDao.findById(id))
-                    .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+        return new ArrayList<>(customer.getRecipients());
 
-            return new ArrayList<>(customer.getRecipients());
-
-        } finally {
-            tx.commit();
-        }
     }
 }
