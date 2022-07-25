@@ -1,13 +1,10 @@
 package org.academiadecodigo.javabank.services;
 
 import org.academiadecodigo.javabank.persistence.model.account.Account;
-import org.academiadecodigo.javabank.persistence.model.account.CheckingAccount;
-import org.academiadecodigo.javabank.persistence.model.account.SavingsAccount;
 import org.academiadecodigo.javabank.persistence.dao.AccountDao;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class AccountServiceImplTest {
@@ -19,45 +16,10 @@ public class AccountServiceImplTest {
     public void setup() {
 
         accountDao = mock(AccountDao.class);
-
         accountService = new AccountServiceImpl();
         accountService.setAccountDao(accountDao);
-
     }
 
-    @Test
-    public void testAddChecking() {
-
-        // setup
-        int fakeId = 9999;
-        Account fakeAccount = mock(Account.class);
-        when(fakeAccount.getId()).thenReturn(fakeId);
-        when(accountDao.saveOrUpdate(any(Account.class))).thenReturn(fakeAccount);
-
-        // exercise
-        int id = accountService.add(new CheckingAccount());
-
-        // verify
-        assertEquals(fakeId, id);
-
-
-    }
-
-    @Test
-    public void testAddSavings() {
-
-        // setup
-        int fakeId = 9999;
-        Account fakeAccount = mock(Account.class);
-        when(fakeAccount.getId()).thenReturn(fakeId);
-        when(accountDao.saveOrUpdate(any(Account.class))).thenReturn(fakeAccount);
-
-        // exercise
-        int id = accountService.add(new SavingsAccount());
-
-        // verify
-        assertEquals(fakeId, id);
-    }
 
     @Test
     public void testDeposit() {
@@ -93,8 +55,9 @@ public class AccountServiceImplTest {
         // setup
         int fakeId = 1;
         double amount = 100.5;
-        Account fakeAccount = spy(Account.class);
+        Account fakeAccount = mock(Account.class);
         when(accountDao.findById(fakeId)).thenReturn(fakeAccount);
+        when(fakeAccount.canWithdraw()).thenReturn(true);
 
         // exercise
         accountService.withdraw(fakeId, amount);
@@ -139,7 +102,6 @@ public class AccountServiceImplTest {
         verify(fakeDstAccount, times(1)).canCredit(amount);
         verify(fakeSrcAccount, times(1)).debit(amount);
         verify(fakeDstAccount, times(1)).credit(amount);
-
     }
 
     @Test
@@ -163,7 +125,6 @@ public class AccountServiceImplTest {
         verify(accountDao, times(1)).saveOrUpdate(fakeSrcAccount);
         verify(accountDao, times(1)).saveOrUpdate(fakeDstAccount);
         verify(fakeSrcAccount, times(1)).canDebit(amount);
-
     }
 
     @Test
@@ -187,7 +148,6 @@ public class AccountServiceImplTest {
         verify(accountDao, times(1)).saveOrUpdate(fakeSrcAccount);
         verify(accountDao, times(1)).saveOrUpdate(fakeDstAccount);
         verify(fakeDstAccount, times(1)).canCredit(amount);
-
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -203,7 +163,6 @@ public class AccountServiceImplTest {
 
         // exercise
         accountService.transfer(fakeSrcId, fakeDstId, amount);
-
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -219,7 +178,5 @@ public class AccountServiceImplTest {
 
         // exercise
         accountService.transfer(fakeSrcId, fakeDstId, amount);
-
     }
-
 }
