@@ -42,4 +42,9 @@ public interface CustomerService {
      * @return the list of recipients of the customer
      */
     List<Recipient> listRecipients(Integer id);
+
+    List<Customer> getAllCustomers();
+
+    void delete(Integer id);
+
 }

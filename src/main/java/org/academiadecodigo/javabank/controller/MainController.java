@@ -1,54 +1,59 @@
 package org.academiadecodigo.javabank.controller;
 
-import org.academiadecodigo.javabank.persistence.model.Customer;
-import org.academiadecodigo.javabank.view.MainView;
-import org.academiadecodigo.javabank.view.Messages;
-import org.academiadecodigo.javabank.view.UserOptions;
+import org.academiadecodigo.javabank.services.CustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.Map;
+@Controller
+public class MainController {
+    CustomerService customer;
 
-/**
- * The {@link MainView} controller
- */
-public class MainController extends AbstractController {
+    @RequestMapping(method = RequestMethod.GET, value = "")
+    public String listCustomer(Model model) {
 
-    private Map<Integer, Controller> controllerMap;
+        model.addAttribute("customers", customer.getAllCustomers());
 
-    /**
-     * Sets the controller map, responsible for the mapping between the menu options and the respective controller
-     *
-     * @param controllerMap the controller map to set
-     */
-    public void setControllerMap(Map<Integer, Controller> controllerMap) {
-        this.controllerMap = controllerMap;
+        return "index";
+
     }
 
-    /**
-     * Gets the customer name
-     *
-     * @return the customer name
-     */
-    public String getCustomerName() {
-        Customer customer = authService.getAccessingCustomer();
-        return customer.getFirstName() + " " + customer.getLastName();
+    @RequestMapping(method = RequestMethod.POST, value = "")
+    public String createCustomer(Model model) {
+
+        model.addAttribute("customers", customer.getAllCustomers());
+
+        return "index";
+
     }
 
-    /**
-     * Invokes the next controller based on menu selection
-     *
-     * @param option the option chosen
-     */
-    public void onMenuSelection(int option) {
 
-        if (option == UserOptions.QUIT.getOption()) {
-            return;
-        }
+    @RequestMapping(method = RequestMethod.GET, value = "/customerDetails/{id}")
+    public String showCustomer(Model model, @PathVariable Integer id) {
 
-        if (!controllerMap.containsKey(option)) {
-            throw new IllegalStateException(Messages.SYSTEM_ERROR);
-        }
 
-        controllerMap.get(option).init();
-        init();
+        model.addAttribute("customers",  customer.get(id) );
+
+        return "customerDetails";
+
     }
+
+    @RequestMapping(method = RequestMethod.GET, value ="/delete/{id}")
+    public String delete(@PathVariable Integer id) {
+        customer.delete(id);
+
+        return "redirect:/";
+    }
+
+    @Autowired
+    public void setCustomer(CustomerService customer) {
+        this.customer = customer;
+    }
+
+
+
+
 }

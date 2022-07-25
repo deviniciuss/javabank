@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaBank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<style>
+    .header {
+        display: flex;
+        justify-content: space-around;
+        align-items: end;
+    }
+    .header h1 {
+
+        font-family: Arial;
+        font-size: 40px;
+        justify-content: flex-start;
+    }
+    .header .headerButton{
+        display: flex;
+        flex-direction: row;
+
+        align-items: end;
+        justify-content: right;
+
+
+
+
+    }
+
+    .list {
+        font-family: Arial;
+        font-size: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .list th, td{
+        text-align: left;
+    }
+    .list tr:nth-child(even) {
+        background-color: white;
+    }
+</style>
+<body>
+<div class="header">
+
+    <h1>Customer List</h1>
+
+
+    <div class="headerButton"><button  type="button" onclick="location.href='/javabank'">Create Customer</button></div>
+
+</div>
+
+<div class="list">
+
+    <table class="table table-striped">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Show</th>
+            <th scope="col">Delete</th>
+
+        </tr>
+        <tr th:each="customer : ${customers}">
+            <td  th:text="${customer.id}"></td>
+            <td  th:text="${customer.firstName}"></td>
+            <td  th:text="${customer.lastName}"></td>
+            <td  th:text="${customer.email}"></td>
+            <td  th:text="${customer.phone}"></td>
+            <td><a th:href="@{'/customerDetails/' + ${customer.id}}">View</a></td>
+            <td><a th:href="@{'/delete/' + ${customer.id}}">Delete</a></td>
+        </tr>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+
+</body>
+</html>
