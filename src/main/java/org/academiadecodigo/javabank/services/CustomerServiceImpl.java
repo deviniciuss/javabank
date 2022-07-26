@@ -1,136 +1,140 @@
 package org.academiadecodigo.javabank.services;
 
-import org.academiadecodigo.javabank.persistence.model.AbstractModel;
+import org.academiadecodigo.javabank.persistence.dto.CustomerDto;
 import org.academiadecodigo.javabank.persistence.model.Customer;
 import org.academiadecodigo.javabank.persistence.model.Recipient;
 import org.academiadecodigo.javabank.persistence.model.account.Account;
+import org.academiadecodigo.javabank.persistence.dao.AccountDao;
 import org.academiadecodigo.javabank.persistence.dao.CustomerDao;
+import org.academiadecodigo.javabank.persistence.dao.RecipientDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.academiadecodigo.javabank.errors.ErrorMessage.*;
 
 /**
  * An {@link CustomerService} implementation
  */
+@Service
 public class CustomerServiceImpl implements CustomerService {
 
     private CustomerDao customerDao;
+    private RecipientDao recipientDao;
+    private AccountDao accountDao;
 
     /**
      * Sets the customer data access object
      *
      * @param customerDao the account DAO to set
      */
-    @Transactional
+    @Autowired
     public void setCustomerDao(CustomerDao customerDao) {
         this.customerDao = customerDao;
     }
 
     /**
-<<<<<<< HEAD
-     * Sets the transaction manager
+     * Sets the recipient data access object
      *
-     * @param tx the transaction manager to set
+     * @param recipientDao the recipient DAO to set
      */
-
+    @Autowired
+    public void setRecipientDao(RecipientDao recipientDao) {
+        this.recipientDao = recipientDao;
+    }
 
     /**
-=======
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
+     * Sets the account data access object
+     *
+     * @param accountDao the account DAO to set
+     */
+    @Autowired
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+    /**
      * @see CustomerService#get(Integer)
      */
-    @Transactional
-
-    @Override
     public Customer get(Integer id) {
-<<<<<<< HEAD
-
-
         return customerDao.findById(id);
-
-=======
-        return customerDao.findById(id);
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
     }
 
     /**
      * @see CustomerService#getBalance(Integer)
      */
-    @Transactional
-
     @Override
     public double getBalance(Integer id) {
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
         Customer customer = Optional.ofNullable(customerDao.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
         return customer.getAccounts().stream()
                 .mapToDouble(Account::getBalance)
                 .sum();
-<<<<<<< HEAD
-
-=======
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
     }
 
     /**
-     * @see CustomerService#listCustomerAccountIds(Integer)
+     * @see CustomerService#delete(Integer)
      */
     @Transactional
-
     @Override
-    public Set<Integer> listCustomerAccountIds(Integer id) {
+    public void delete(Integer id) {
+        customerDao.delete(id);
+    }
 
-<<<<<<< HEAD
-
-        Customer customer = Optional.ofNullable(customerDao.findById(id))
-                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
-
-        return customer.getAccounts().stream()
-                .map(AbstractModel::getId)
-                .collect(Collectors.toSet());
-
-
-=======
-        Customer customer = Optional.ofNullable(customerDao.findById(id))
-                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
-
-        return customer.getAccounts().stream()
-                .map(AbstractModel::getId)
-                .collect(Collectors.toSet());
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
+    /**
+     * @see CustomerService#list()
+     */
+    @Override
+    public List<Customer> list() {
+        return customerDao.findAll();
     }
 
     /**
      * @see CustomerService#listRecipients(Integer)
      */
-<<<<<<< HEAD
-    @Transactional
-
-    @Override
-    public List<Recipient> listRecipients(Integer id) {
-
-
-        Customer customer = Optional.ofNullable(customerDao.findById(id))
-                .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
-
-        return new ArrayList<>(customer.getRecipients());
-
-=======
     @Transactional(readOnly = true)
     @Override
     public List<Recipient> listRecipients(Integer id) {
 
+        // check then act logic requires transaction,
+        // event if read only
         Customer customer = Optional.ofNullable(customerDao.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
         return new ArrayList<>(customer.getRecipients());
->>>>>>> 9d2388ea9e1e59c86ff6170772ac68772bd2c651
+    }
+
+    /**
+     * @see CustomerService#removeRecipient(Integer, Integer)
+     */
+    @Transactional
+    @Override
+    public void removeRecipient(Integer id, Integer recipientId) {
+
+        Customer customer = Optional.ofNullable(customerDao.findById(id))
+                .orElseThrow(() -> new IllegalArgumentException(CUSTOMER_NOT_FOUND));
+
+        Recipient recipient = Optional.ofNullable(recipientDao.findById(recipientId))
+                .orElseThrow(() -> new IllegalArgumentException(RECIPIENT_NOT_FOUND));
+
+        if (!recipient.getCustomer().getId().equals(id)) {
+            throw new IllegalArgumentException(CUSTOMER_RECIPIENT_NOT_FOUND);
+        }
+
+        customer.removeRecipient(recipient);
+        customerDao.saveOrUpdate(customer);
+    }
+
+    @Transactional
+    @Override
+    public Customer save(Customer customer) {
+        return customerDao.saveOrUpdate(customer);
     }
 }
+

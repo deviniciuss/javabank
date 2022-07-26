@@ -18,6 +18,8 @@ import java.util.List;
 public abstract class GenericJpaDao<T extends Model> implements Dao<T> {
 
     protected Class<T> modelType;
+
+    @PersistenceContext
     protected EntityManager em;
 
     /**
@@ -34,7 +36,6 @@ public abstract class GenericJpaDao<T extends Model> implements Dao<T> {
      *
      * @param em the entity manager to set
      */
-    @PersistenceContext
     public void setEm(EntityManager em) {
         this.em = em;
     }

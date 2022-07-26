@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <thymeleaf th:replace="header :: header"/>
+</head>
+<body>
+<div class="container">
+
+    <h1>ADD Customer</h1>
+
+    <form th:object="${customer}" th:action="@{/customer/add}" method="post">
+
+
+        <!--<legend>Disabled fieldset example</legend> -->
+        <div class="mb-3">
+            <input type="text" th:field="*{firstName}" class="form-control col-4 mb-4" placeholder="Enter First Name"/>
+        </div>
+
+        <div class="mb-3">
+            <input type="text" th:field="*{lastName}" class="form-control col-4 mb-4" placeholder="Enter Last Name"/>
+        </div>
+        <div class="mb-3">
+            <input type="text" th:field="*{firstName}" class="form-control col-4 mb-4" placeholder="Enter First Name"/>
+        </div>
+        <div class="mb-3">
+            <input type="text" th:field="*{firstName}" class="form-control col-4 mb-4" placeholder="Enter First Name"/>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Add Customer</button>
+        <a class="btn btn-warning" href="/javabank2/customer/list">Cancel</a>
+    </form>
+
+</div>
+</body>
+</html>
+
+
+
+
+
+
