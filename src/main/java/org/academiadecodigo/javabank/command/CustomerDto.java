@@ -10,6 +10,7 @@ import javax.validation.constraints.*;
 public class CustomerDto {
 
     private Integer id;
+
     @NotNull(message = "first name is mandatory")
     @NotBlank(message = "first name is mandatory")
     @Size(min=3, max=64)
@@ -18,13 +19,21 @@ public class CustomerDto {
     @NotNull(message = "last name is mandatory")
     @NotBlank(message = "last name is mandatory")
     @Size(min=3, max=64)
+
+
+    @NotNull(message = "first name is mandatory")
+    @NotBlank(message = "first name is mandatory")
+    @Size(min = 3, max = 64)
     private String lastName;
 
     @Email
     private String email;
 
+
     @Pattern(regexp = "^\\+?[0-9]*$", message = "phone has invalid characters")
     @Size(min=9, max=16)
+    @Pattern(regexp = "^\\+?[0-9]*$", message = "phone number contains invalid characters")
+    @Size(min = 9, max = 16)
     private String phone;
 
     /**

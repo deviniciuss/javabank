@@ -20,7 +20,7 @@ public class Customer extends AbstractModel {
 
     @OneToMany(
             // propagate changes on customer entity to account entities
-            cascade = {CascadeType.ALL},
+            cascade = {CascadeType.REMOVE},
 
             // make sure to remove accounts if unlinked from customer
             orphanRemoval = true,
