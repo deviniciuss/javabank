@@ -194,7 +194,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void deleteAccount(Integer cid, Integer aid) {
         get(cid).removeAccount(accountDao.findById(aid));
-        customerDao.saveOrUpdate(get(cid));
+        //customerDao.saveOrUpdate(get(cid));
     }
 }
 
